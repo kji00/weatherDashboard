@@ -1,5 +1,6 @@
-var searchInputEl = document.querySelector("#search-input");
-var formSubmitEl = document.querySelector('#search-form');
+var searchInputEl = document.querySelector("#search-input")
+var formSubmitEl = document.querySelector('#search-form')
+var cityResultsContainerEl = document.querySelector('#city-results')
 
 var formSubmitHandler = function (event) {
     event.preventDefault();
@@ -20,7 +21,18 @@ var getWeather = function (searchInput) {
         }
     })
     .then(function (PromiseResult) {
-        console.log(PromiseResult);
+        localStorage.setItem(searchInput, JSON.stringify(PromiseResult));
+        for(var i = 0; i < PromiseResult.length; i++){
+            var searchCity = PromiseResult[i].name;
+            var searchState = PromiseResult[i].state;
+            var searchCountry = PromiseResult[i].country;
+            var citylistEl = document.createElement('button');
+            citylistEl.textContent = searchCity + ',' + searchState + ': ' + searchCountry
+            citylistEl.setAttribute('refNum', i)
+
+            cityResultsContainerEl.appendChild(citylistEl)
+
+        };
     })
 
 }

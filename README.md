@@ -1,6 +1,8 @@
 # weatherDashboard
 
-The purpose of this web application is get weather information from various locations and present it to the user. The user story is as follow:
+
+
+The purpose of this web application is get weather information from various locations and present it to the user. The city will The user story is as follow:
 
 User story
 

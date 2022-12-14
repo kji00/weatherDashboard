@@ -1,17 +1,29 @@
-navigator.geolocation
+var searchInputEl = document.querySelector("#search-input");
+var formSubmitEl = document.querySelector('#search-form');
 
-var latitudeEl = navigator.geolocation.getCurrentPosition(lat)
-var longitudeEl = navigator.geolocation.getCurrentPosition(long)
+var formSubmitHandler = function (event) {
+    event.preventDefault();
 
-function lat(e){
-    return e.coords.latitude
+    var searchInput = searchInputEl.value.trim();
+    if (searchInput) {
+        getWeather(searchInput);
+    }
 }
 
-console.log(latitudeEl);
+var getWeather = function (searchInput) {
 
-// fetchURL = "https://api.openweathermap.org/data/2.5/forecast?lat=" + p + "&lon=" + {lon} + "&appid=982e602762d0f897c0cbabd69277fd71"
+    fetchURL = 'http://api.openweathermap.org/geo/1.0/direct?q=' + searchInput + '&limit=5&appid=982e602762d0f897c0cbabd69277fd71'
 
-// fetch(fetchURL)
-// .then(function (response){
-//     console.log(response.json());
-// })
+    fetch(fetchURL).then(function (response) {
+        if (response.ok) {
+            return response.json();
+        }
+    })
+    .then(function (PromiseResult) {
+        console.log(PromiseResult);
+    })
+
+}
+
+
+formSubmitEl.addEventListener('submit', formSubmitHandler);

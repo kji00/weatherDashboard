@@ -2,8 +2,10 @@ var searchInputEl = document.querySelector("#search-input");
 var formSubmitEl = document.querySelector('#search-form');
 var cityResultsContainerEl = document.querySelector('#city-results');
 var currentWeatherEl = document.querySelector('#current-weather');
+var fiveDayEl = document.querySelector('#five-day-container');
 var dataState = cityResultsContainerEl.getAttribute('data-list');
 var cityName = '';
+
 
 // Takes user search input and sends the input value to openweather API
 var formSubmitHandler = function (event) {
@@ -104,7 +106,6 @@ var getForecast = function (latitude, longitude) {
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
 var renderCurrentWeather = function (weatherObj) {
-    console.log(weatherObj)
     var currentDate = dayjs(weatherObj.dt * 1000).format('M/DD/YYYY')
     var getIcon = 'https://openweathermap.org/img/w/' + weatherObj.weather[0].icon + '.png'
     var currentTemp = weatherObj.main.temp
@@ -137,7 +138,7 @@ var renderCurrentWeather = function (weatherObj) {
 
     // Create p tag with current humidity
     var currentHumidityEl = document.createElement('p');
-    var humidityNode = document.createTextNode('Wind: ' + currentHumidity + ' %');
+    var humidityNode = document.createTextNode('Humidity: ' + currentHumidity + ' %');
     currentHumidityEl.appendChild(humidityNode);
     currentWeatherEl.appendChild(currentHumidityEl);
 
@@ -151,7 +152,58 @@ var renderCurrentWeather = function (weatherObj) {
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
 var renderForecast = function (forecastObj) {
+    var i = 0;
+    var ref = 0;
     console.log(forecastObj)
+    console.log(dayjs(forecastObj[0].dt * 1000).format('M/DD/YYYY'))
+    while (i < 5){
+        var forecastDate = dayjs(forecastObj[ref].dt * 1000).format('M/DD/YYYY')
+        var forecastIcon = 'https://openweathermap.org/img/w/' + forecastObj[ref].weather[0].icon + '.png'
+        var forecastTemp = forecastObj[ref].main.temp
+        var forecastWind = forecastObj[ref].wind.speed
+        var forecastHumidity = forecastObj[ref].main.humidity
+        
+        // create div for each day of the forecast
+        var newDiv = document.createElement('div')
+        newDiv.setAttribute('class', 'box')
+        fiveDayEl.appendChild(newDiv)
+
+        // Create h1 tag with forecast date
+        var newDivEl = document.querySelector('.box')
+        var forecastDateEl = document.createElement('h1');
+        var forecastDateNode = document.createTextNode(forecastDate);
+        forecastDateEl.appendChild(forecastDateNode);
+        newDivEl.appendChild(forecastDateEl);
+
+        //create weather icon that reflects forecast weather status
+        var forecastIconEl = document.createElement('img')
+        forecastIconEl.setAttribute('src', forecastIcon)
+        newDivEl.appendChild(forecastIconEl);
+
+        // Create p tag with forecast temperature
+        var forecastTempEl = document.createElement('p');
+        var forecastTempNode = document.createTextNode('Temp: ' + forecastTemp + ' °F');
+        forecastTempEl.appendChild(forecastTempNode);
+        newDivEl.appendChild(forecastTempEl);
+
+        // Create p tag with forecast wind
+        var forecastWindSpeedEl = document.createElement('p');
+        var forecastWindNode = document.createTextNode('Wind: ' + forecastWind + ' MPH');
+        forecastWindSpeedEl.appendChild(forecastWindNode);
+        newDivEl.appendChild(forecastWindSpeedEl);
+
+        // Create p tag with forecast humidity
+        var forecastHumidityEl = document.createElement('p');
+        var forecastHumidityNode = document.createTextNode('Humidity: ' + forecastHumidity + ' %');
+        forecastHumidityEl.appendChild(forecastHumidityNode);
+        newDivEl.appendChild(forecastHumidityEl);
+
+        ref += 8;
+        i++;
+
+        console.log(ref)
+        console.log(i)
+    }
 }
 
 // find first 12:00:00 (n) then +8 from that index (n+8),  = 5 day forecast at 12:00pm each day

@@ -1,8 +1,9 @@
-var searchInputEl = document.querySelector("#search-input")
-var formSubmitEl = document.querySelector('#search-form')
-var cityResultsContainerEl = document.querySelector('#city-results')
-var dataState = cityResultsContainerEl.getAttribute('data-list')
-var cityName = ''
+var searchInputEl = document.querySelector("#search-input");
+var formSubmitEl = document.querySelector('#search-form');
+var cityResultsContainerEl = document.querySelector('#city-results');
+var currentWeatherEl = document.querySelector('#current-weather');
+var dataState = cityResultsContainerEl.getAttribute('data-list');
+var cityName = '';
 
 // Takes user search input and sends the input value to openweather API
 var formSubmitHandler = function (event) {
@@ -25,19 +26,19 @@ var getCity = function (searchInput) {
             return response.json();
         }
     })
-    .then(function (PromiseResult) {
-        localStorage.setItem(searchInput, JSON.stringify(PromiseResult));
-        renderCity(PromiseResult)
-    });
+        .then(function (PromiseResult) {
+            localStorage.setItem(searchInput, JSON.stringify(PromiseResult));
+            renderCity(PromiseResult)
+        });
 }
 
 // takes returned object from API call and posts object to webpage
-var renderCity = function(PromiseResult){
-    if(dataState == 'false'){
+var renderCity = function (PromiseResult) {
+    if (dataState == 'false') {
         cityResultsContainerEl.setAttribute('data-list', 'true')
         dataState = 'true'
     }
-    for(var i = 0; i < PromiseResult.length; i++){
+    for (var i = 0; i < PromiseResult.length; i++) {
         var searchCity = PromiseResult[i].name;
         var searchState = PromiseResult[i].state;
         var searchCountry = PromiseResult[i].country;
@@ -50,8 +51,8 @@ var renderCity = function(PromiseResult){
 }
 
 // Takes the user chosen city and gets the latitude and longitude to pass to the getWeather function
-var getCoords = function (event){
-    if(dataState == 'true'){
+var getCoords = function (event) {
+    if (dataState == 'true') {
         var pickCity = event.target.getAttribute('refNum');
         if (pickCity) {
             var pickCityRef = parseInt(pickCity)
@@ -65,7 +66,7 @@ var getCoords = function (event){
 }
 
 // Take latitude and longitude to get precise weather info from chosen city for the current day
-var getCurrentWeather = function (latitude, longitude){
+var getCurrentWeather = function (latitude, longitude) {
 
     fetchURL = 'https://api.openweathermap.org/data/2.5/weather?lat=' + latitude + '&lon=' + longitude + '&appid=982e602762d0f897c0cbabd69277fd71&units=imperial'
 
@@ -74,14 +75,14 @@ var getCurrentWeather = function (latitude, longitude){
             return response.json();
         }
     })
-    .then(function (PromiseResult) {
-        renderCurrentWeather(PromiseResult)
-    })
+        .then(function (PromiseResult) {
+            renderCurrentWeather(PromiseResult)
+        })
 
 }
 
 // Take latitude and longitude to get precise weather info from chosen city for a 5 day forecast
-var getForecast = function(latitude, longitude){
+var getForecast = function (latitude, longitude) {
 
     fetchURL = 'http://api.openweathermap.org/data/2.5/forecast?lat=' + latitude + '&lon=' + longitude + '&appid=982e602762d0f897c0cbabd69277fd71&units=imperial'
 
@@ -90,31 +91,66 @@ var getForecast = function(latitude, longitude){
             return response.json();
         }
     })
-    .then(function (PromiseResult) {
-        renderForecast(PromiseResult.list)
-    })
+        .then(function (PromiseResult) {
+            renderForecast(PromiseResult.list)
+        })
 }
 
-// Take current weather object and render results to the screen for current weather and then save the city and the current weather results into local storage. 
+// Take current weather object and render results to the screen for current weather conditions in chosen city. 
 // Needs to include following information:
-// 1. displays date (dt_txt)
-// 2. icon representation of weather conditions (weather[0].description)
+// 1. displays date (dt - is shown in seconds, convert with dayjs)
+// 2. icon representation of weather conditions (weather[0].icon)
 // 3. temperature (main.temp)
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
-var renderCurrentWeather = function(weatherObj){
+var renderCurrentWeather = function (weatherObj) {
     console.log(weatherObj)
+    var currentDate = dayjs(weatherObj.dt * 1000).format('M/DD/YYYY')
+    var getIcon = 'https://openweathermap.org/img/w/' + weatherObj.weather[0].icon + '.png'
+    var currentTemp = weatherObj.main.temp
+    var currentWindSpeed = weatherObj.wind.speed
+    var currentHumidity = weatherObj.main.humidity
+
+    // Create h1 tag with current date
+    var currentDateEl = document.createElement('h1');
+    var dateNode = document.createTextNode(currentDate);
+    currentDateEl.appendChild(dateNode);
+    currentWeatherEl.appendChild(currentDateEl);
+
+    //create weather icon that reflects current weather status
+    var getIconEl = document.createElement('img')
+    getIconEl.setAttribute('src', getIcon)
+    currentWeatherEl.appendChild(getIconEl);
+
+
+    // Create p tag with current temperature
+    var currentTempEl = document.createElement('p');
+    var tempNode = document.createTextNode('Temp: ' + currentTemp + ' °F');
+    currentTempEl.appendChild(tempNode);
+    currentWeatherEl.appendChild(currentTempEl);
+
+    // Create p tag with current wind
+    var currentWindSpeedEl = document.createElement('p');
+    var windNode = document.createTextNode('Wind: ' + currentWindSpeed + ' MPH');
+    currentWindSpeedEl.appendChild(windNode);
+    currentWeatherEl.appendChild(currentWindSpeedEl);
+
+    // Create p tag with current humidity
+    var currentHumidityEl = document.createElement('p');
+    var humidityNode = document.createTextNode('Wind: ' + currentHumidity + ' %');
+    currentHumidityEl.appendChild(humidityNode);
+    currentWeatherEl.appendChild(currentHumidityEl);
 
 }
 
 // Take forecast object and render results to the screen for a 5 day forecast and then save the city and the 5 day result into local storage. 
 // Needs to include following information:
-// 1. displays date (dt_txt)
-// 2. icon representation of weather conditions (weather[0].description)
+// 1. displays date (dt_txt - is shown in seconds, convert with dayjs)
+// 2. icon representation of weather conditions (weather[0].icon)
 // 3. temperature (main.temp)
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
-var renderForecast = function(forecastObj){
+var renderForecast = function (forecastObj) {
     console.log(forecastObj)
 }
 

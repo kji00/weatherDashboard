@@ -94,7 +94,8 @@ var getForecast = function (latitude, longitude) {
         }
     })
         .then(function (PromiseResult) {
-            renderForecast(PromiseResult.list)
+            var forecastObj = PromiseResult.list
+            renderForecast(forecastObj)
         })
 }
 
@@ -118,7 +119,7 @@ var renderCurrentWeather = function (weatherObj) {
     currentDateEl.appendChild(dateNode);
     currentWeatherEl.appendChild(currentDateEl);
 
-    //create weather icon that reflects current weather status
+    // Create weather icon that reflects current weather status
     var getIconEl = document.createElement('img')
     getIconEl.setAttribute('src', getIcon)
     currentWeatherEl.appendChild(getIconEl);
@@ -152,62 +153,70 @@ var renderCurrentWeather = function (weatherObj) {
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
 var renderForecast = function (forecastObj) {
-    var i = 0;
     var ref = 0;
-    console.log(forecastObj)
-    console.log(dayjs(forecastObj[0].dt * 1000).format('M/DD/YYYY'))
-    while (i < 5){
+    var now = parseInt(dayjs().format('D'))
+
+    // finds first iteration where it is the next day
+    for (var x = 0; x < forecastObj.length; x++){
+        var getDay = parseInt(dayjs(forecastObj[x].dt * 1000).format('D'))
+        console.log(getDay)
+        if (now < getDay){
+            ref = x;
+            break
+        }
+    }
+
+    for (var i = 0; i < 5; i++){
         var forecastDate = dayjs(forecastObj[ref].dt * 1000).format('M/DD/YYYY')
+        console.log(forecastDate)
         var forecastIcon = 'https://openweathermap.org/img/w/' + forecastObj[ref].weather[0].icon + '.png'
         var forecastTemp = forecastObj[ref].main.temp
         var forecastWind = forecastObj[ref].wind.speed
         var forecastHumidity = forecastObj[ref].main.humidity
-        
-        // create div for each day of the forecast
-        var newDiv = document.createElement('div')
-        newDiv.setAttribute('class', 'box')
-        fiveDayEl.appendChild(newDiv)
+
+         // create div for each day of the forecast
+         var newDiv = document.createElement('div')
+         newDiv.setAttribute('class', 'box')
+         newDiv.setAttribute('id', 'day'+i)
+         fiveDayEl.appendChild(newDiv)
 
         // Create h1 tag with forecast date
-        var newDivEl = document.querySelector('.box')
+        var newTagEl = document.querySelector('.box');
         var forecastDateEl = document.createElement('h1');
         var forecastDateNode = document.createTextNode(forecastDate);
         forecastDateEl.appendChild(forecastDateNode);
-        newDivEl.appendChild(forecastDateEl);
+        newTagEl.appendChild(forecastDateEl);
 
-        //create weather icon that reflects forecast weather status
+        // Create weather icon that reflects forecast weather status
         var forecastIconEl = document.createElement('img')
         forecastIconEl.setAttribute('src', forecastIcon)
-        newDivEl.appendChild(forecastIconEl);
+        newTagEl.appendChild(forecastIconEl);
 
         // Create p tag with forecast temperature
         var forecastTempEl = document.createElement('p');
         var forecastTempNode = document.createTextNode('Temp: ' + forecastTemp + ' °F');
         forecastTempEl.appendChild(forecastTempNode);
-        newDivEl.appendChild(forecastTempEl);
+        newTagEl.appendChild(forecastTempEl);
 
         // Create p tag with forecast wind
         var forecastWindSpeedEl = document.createElement('p');
         var forecastWindNode = document.createTextNode('Wind: ' + forecastWind + ' MPH');
         forecastWindSpeedEl.appendChild(forecastWindNode);
-        newDivEl.appendChild(forecastWindSpeedEl);
+        newTagEl.appendChild(forecastWindSpeedEl);
 
         // Create p tag with forecast humidity
         var forecastHumidityEl = document.createElement('p');
         var forecastHumidityNode = document.createTextNode('Humidity: ' + forecastHumidity + ' %');
         forecastHumidityEl.appendChild(forecastHumidityNode);
-        newDivEl.appendChild(forecastHumidityEl);
+        newTagEl.appendChild(forecastHumidityEl);
 
+        // find first next day then +8 from that index (n+8) to get the following day after that, = 5 day forecast 
         ref += 8;
-        i++;
-
-        console.log(ref)
-        console.log(i)
     }
 }
 
-// find first 12:00:00 (n) then +8 from that index (n+8),  = 5 day forecast at 12:00pm each day
-// 
+
+
 
 
 cityResultsContainerEl.addEventListener('click', getCoords)

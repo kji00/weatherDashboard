@@ -1,13 +1,17 @@
 var searchInputEl = document.querySelector("#search-input");
 var formSubmitEl = document.querySelector('#search-form');
 var cityResultsContainerEl = document.querySelector('#city-results');
+var allWeatherEl = document.querySelector('#all-weather-container');
 var currentWeatherEl = document.querySelector('#current-weather');
 var fiveDayEl = document.querySelector('#five-day-container');
+var savedCityEl = document.querySelector('#saved-city');
 var dataState = cityResultsContainerEl.getAttribute('data-list');
 var cityName = '';
 
 
+
 // Takes user search input and sends the input value to openweather API
+
 var formSubmitHandler = function (event) {
     event.preventDefault();
 
@@ -40,20 +44,26 @@ var renderCity = function (PromiseResult) {
         cityResultsContainerEl.setAttribute('data-list', 'true')
         dataState = 'true'
     }
+
     for (var i = 0; i < PromiseResult.length; i++) {
         var searchCity = PromiseResult[i].name;
         var searchState = PromiseResult[i].state;
         var searchCountry = PromiseResult[i].country;
         var citylistEl = document.createElement('button');
-        citylistEl.textContent = searchCity + ',' + searchState + ': ' + searchCountry
+        citylistEl.textContent = searchCity + ', ' + searchState + ': ' + searchCountry
         citylistEl.setAttribute('refNum', i)
+        citylistEl.setAttribute('class', "btn btn-info btn-block d-block")
         cityResultsContainerEl.appendChild(citylistEl)
 
     };
+
 }
 
 // Takes the user chosen city and gets the latitude and longitude to pass to the getWeather function
 var getCoords = function (event) {
+
+    cityResultsContainerEl.innerHTML = '';
+
     if (dataState == 'true') {
         var pickCity = event.target.getAttribute('refNum');
         if (pickCity) {
@@ -61,6 +71,12 @@ var getCoords = function (event) {
             var cityResultObj = JSON.parse(localStorage.getItem(cityName))
             var latitude = cityResultObj[pickCityRef].lat
             var longitude = cityResultObj[pickCityRef].lon
+            var coordObj = {
+                citylat: latitude,
+                citylon: longitude
+            }
+            localStorage.setItem(cityName + 'Coords', JSON.stringify(coordObj))
+            allWeatherEl.style.display = "block";
             getForecast(latitude, longitude)
             getCurrentWeather(latitude, longitude)
         }
@@ -107,6 +123,9 @@ var getForecast = function (latitude, longitude) {
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
 var renderCurrentWeather = function (weatherObj) {
+
+    currentWeatherEl.innerHTML = '';
+
     var currentDate = dayjs(weatherObj.dt * 1000).format('M/DD/YYYY')
     var getIcon = 'https://openweathermap.org/img/w/' + weatherObj.weather[0].icon + '.png'
     var currentTemp = weatherObj.main.temp
@@ -115,7 +134,7 @@ var renderCurrentWeather = function (weatherObj) {
 
     // Create h1 tag with current date
     var currentDateEl = document.createElement('h1');
-    var dateNode = document.createTextNode(currentDate);
+    var dateNode = document.createTextNode(cityName + ' ' + currentDate);
     currentDateEl.appendChild(dateNode);
     currentWeatherEl.appendChild(currentDateEl);
 
@@ -153,36 +172,46 @@ var renderCurrentWeather = function (weatherObj) {
 // 4. wind speed (wind.speed)
 // 5. humidity (main.humidity)
 var renderForecast = function (forecastObj) {
+
     var ref = 0;
     var now = parseInt(dayjs().format('D'))
+    var savedForecast = []
 
     // finds first iteration where it is the next day
-    for (var x = 0; x < forecastObj.length; x++){
+    for (var x = 0; x < forecastObj.length; x++) {
         var getDay = parseInt(dayjs(forecastObj[x].dt * 1000).format('D'))
-        console.log(getDay)
-        if (now < getDay){
+        if (now < getDay) {
             ref = x;
             break
         }
     }
 
-    for (var i = 0; i < 5; i++){
+    fiveDayEl.innerHTML = '';
+
+    for (var i = 0; i < 5; i++) {
         var forecastDate = dayjs(forecastObj[ref].dt * 1000).format('M/DD/YYYY')
-        console.log(forecastDate)
         var forecastIcon = 'https://openweathermap.org/img/w/' + forecastObj[ref].weather[0].icon + '.png'
         var forecastTemp = forecastObj[ref].main.temp
         var forecastWind = forecastObj[ref].wind.speed
         var forecastHumidity = forecastObj[ref].main.humidity
+        var newObj = {
+            date: forecastDate,
+            icon: forecastIcon,
+            temp: forecastTemp,
+            wind: forecastWind,
+            humidity: forecastHumidity
+        }
 
-         // create div for each day of the forecast
-         var newDiv = document.createElement('div')
-         newDiv.setAttribute('class', 'box')
-         newDiv.setAttribute('id', 'day'+i)
-         fiveDayEl.appendChild(newDiv)
+        // Create div with day+i id and class of box
+        var newDay = document.createElement('div')
+        newDay.id = 'day' + i;
+        newDay.className = 'box';
+        fiveDayEl.appendChild(newDay);
+
 
         // Create h1 tag with forecast date
-        var newTagEl = document.querySelector('.box');
-        var forecastDateEl = document.createElement('h1');
+        var newTagEl = document.getElementById('day' + i);
+        var forecastDateEl = document.createElement('h3');
         var forecastDateNode = document.createTextNode(forecastDate);
         forecastDateEl.appendChild(forecastDateNode);
         newTagEl.appendChild(forecastDateEl);
@@ -212,12 +241,86 @@ var renderForecast = function (forecastObj) {
 
         // find first next day then +8 from that index (n+8) to get the following day after that, = 5 day forecast 
         ref += 8;
+
+        savedForecast.push(newObj)
+    }
+
+    localStorage.setItem(cityName + 'Key', JSON.stringify(savedForecast));
+    renderCityHistory(cityName)
+}
+
+var renderCityHistory = function (cityName) {
+    var savedCitiesEl = document.querySelector('#saved-cities')
+    var cityHistory = document.createElement('button');
+    cityHistory.setAttribute('class', "btn btn-info btn-block d-block")
+    cityHistory.id = cityName + 'Key';
+    cityHistory.name = cityName;
+    cityHistory.textContent = cityName
+    savedCitiesEl.appendChild(cityHistory)
+
+}
+
+// redisplay current weather for previously selected cities
+var displayHistory = function (event) {
+    var redisplayCity = event.target.getAttribute('name');
+    var previousCity = JSON.parse(localStorage.getItem(redisplayCity + 'Coords'));
+    cityName = redisplayCity;
+    getCurrentWeather(previousCity.citylat, previousCity.citylon);
+    displayForecastHistory(redisplayCity)
+}
+
+var displayForecastHistory = function(cityForecast){
+    var cityKeyObj = JSON.parse(localStorage.getItem(cityForecast+'Key'))
+    console.log(cityKeyObj)
+
+    fiveDayEl.innerHTML = '';
+
+    for (var i = 0; i < 5; i++) {
+        var previousDate = cityKeyObj[i].date
+        var previousIcon = cityKeyObj[i].icon
+        var previousTemp = cityKeyObj[i].temp
+        var previousWind = cityKeyObj[i].wind
+        var previousHumidity = cityKeyObj[i].humidity
+
+        // Create div with day+i id and class of box
+        var newDay = document.createElement('div')
+        newDay.id = 'day' + i;
+        newDay.className = 'box';
+        fiveDayEl.appendChild(newDay);
+
+
+        // Create h1 tag with previous date
+        var newTagEl = document.getElementById('day' + i);
+        var previousDateEl = document.createElement('h3');
+        var previousDateNode = document.createTextNode(previousDate);
+        previousDateEl.appendChild(previousDateNode);
+        newTagEl.appendChild(previousDateEl);
+
+        // Create weather icon that reflects previous weather status
+        var previousIconEl = document.createElement('img')
+        previousIconEl.setAttribute('src', previousIcon)
+        newTagEl.appendChild(previousIconEl);
+
+        // Create p tag with previous temperature
+        var previousTempEl = document.createElement('p');
+        var previousTempNode = document.createTextNode('Temp: ' + previousTemp + ' °F');
+        previousTempEl.appendChild(previousTempNode);
+        newTagEl.appendChild(previousTempEl);
+
+        // Create p tag with previous wind
+        var previousWindSpeedEl = document.createElement('p');
+        var previousWindNode = document.createTextNode('Wind: ' + previousWind + ' MPH');
+        previousWindSpeedEl.appendChild(previousWindNode);
+        newTagEl.appendChild(previousWindSpeedEl);
+
+        // Create p tag with previous humidity
+        var previousHumidityEl = document.createElement('p');
+        var previousHumidityNode = document.createTextNode('Humidity: ' + previousHumidity + ' %');
+        previousHumidityEl.appendChild(previousHumidityNode);
+        newTagEl.appendChild(previousHumidityEl);
     }
 }
 
-
-
-
-
-cityResultsContainerEl.addEventListener('click', getCoords)
+savedCityEl.addEventListener('click', displayHistory);
+cityResultsContainerEl.addEventListener('click', getCoords);
 formSubmitEl.addEventListener('submit', formSubmitHandler);

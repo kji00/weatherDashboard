@@ -1,0 +1,48 @@
+#title-banner {
+    font-style: italic;
+    text-align: center;
+}
+
+#all-search-section {
+    margin: 0px 5px 5px;
+}
+
+#search-container {
+    padding: 5px;
+    border-bottom: 5px solid rgb(143, 131, 131);
+}
+
+#search-input {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+#city-results {
+    padding: 5px;
+    margin-bottom: 0px;
+}
+
+#saved-cities {
+    padding: 0;
+}
+
+#all-weather-container {
+    width: 70%
+}
+
+#current {
+    margin: 1px;
+    border: 2px solid black;
+}
+
+#current-weather {
+    padding: 10px;
+}
+
+.box {
+    color: #fff;
+    margin: 10px 3px;
+    padding: 5px;
+    width: 20%;
+    background-color: rgb(7, 41, 73);
+}

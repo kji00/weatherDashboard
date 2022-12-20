@@ -9,31 +9,37 @@
     <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
 </head>
 <body>
-    <header>Weather Dashboard</header>
-    <main>
-        <section>
-            <h2>Search for a City:</h2>
-            <div id="search-containter">
-                <form id="search-form">
-                    <input id="search-input" name="city-search" type="text">
-                    <button type="submit">Search</button>
-                </form>
+    <header id="title-banner" class="bg-primary text-white">
+        <h1>Weather Dashboard</h1>
+    </header>
+    <main class="d-flex">
+        <section id="all-search-section" class="d-flex flex-column flex-child">
+            <div id="search-container">
+                <h2>Search for a City:</h2>
+                <div id="search-containter">
+                    <form id="search-form">
+                        <input id="search-input" name="city-search" type="text">
+                        <button id="search-button" class="btn btn-primary btn-block" type="submit" >Search</button>
+                    </form>
+                </div>
             </div>
             <div id="city-picker">
                 <ul id="city-results" data-list="false"></ul>
             </div>
-        </section>
-        <section>
-            <div id="saved-city-container">
-                <ul id="saved-cities"></ul>
+            <div id="saved-city">
+                <div id="saved-city-container">
+                    <ol id="saved-cities"></ol>
+                </div>
             </div>
         </section>
-        <section>
-            <div id="current-weather">   
+        <section id="all-weather-container" class="flex-child" style="display:none">
+            <div id="current">
+                <div id="current-weather">   
+                </div>
             </div>
-        </section>
-        <section>
-            <div id="five-day-container">
+            <div id="five-day">
+                <div id="five-day-container" class="d-flex flex-row">
+                </div>
             </div>
         </section>
     </main>

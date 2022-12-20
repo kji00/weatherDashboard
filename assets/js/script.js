@@ -25,7 +25,7 @@ var formSubmitHandler = function (event) {
 // openweather API call takes user search query and returns a maximum of 5 choices to choose from. Results are listed as a button to choose from
 var getCity = function (searchInput) {
 
-    fetchURL = 'http://api.openweathermap.org/geo/1.0/direct?q=' + searchInput + '&limit=5&appid=982e602762d0f897c0cbabd69277fd71'
+    fetchURL = 'https://api.openweathermap.org/geo/1.0/direct?q=' + searchInput + '&limit=5&appid=982e602762d0f897c0cbabd69277fd71'
 
     fetch(fetchURL).then(function (response) {
         if (response.ok) {
@@ -102,7 +102,7 @@ var getCurrentWeather = function (latitude, longitude) {
 // Take latitude and longitude to get precise weather info from chosen city for a 5 day forecast
 var getForecast = function (latitude, longitude) {
 
-    fetchURL = 'http://api.openweathermap.org/data/2.5/forecast?lat=' + latitude + '&lon=' + longitude + '&appid=982e602762d0f897c0cbabd69277fd71&units=imperial'
+    fetchURL = 'https://api.openweathermap.org/data/2.5/forecast?lat=' + latitude + '&lon=' + longitude + '&appid=982e602762d0f897c0cbabd69277fd71&units=imperial'
 
     fetch(fetchURL).then(function (response) {
         if (response.ok) {

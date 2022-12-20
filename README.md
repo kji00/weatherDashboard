@@ -7,9 +7,9 @@
 ![LocalStorage](./assets/images/localStorage.png)
 
 
-![GithubRepo](https://github.com/kji00/weatherDashboard)
+(https://github.com/kji00/weatherDashboard)
 
-![GithubLivePage](https://kji00.github.io/weatherDashboard/)
+(https://kji00.github.io/weatherDashboard/)
 
 The purpose of this web application is to get weather information from various locations and present it to the user. When a user searches for a city, the user gets prompted with multiple cities to choose from (to get the exact city the user wants). After the city is chosen, the exact cooredinates are taken and requested from the openweathermap API. 5 Day forecasts are disaplyed and stored to local storage to keep a track of cities searched.
 
